@@ -1,0 +1,4 @@
+MEL
+
+1) Expression is is placed uner #[flowVar.name]
+								#[sessionVar.name]

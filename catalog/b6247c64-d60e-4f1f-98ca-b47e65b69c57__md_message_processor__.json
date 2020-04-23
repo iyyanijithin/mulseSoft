@@ -1,0 +1,17 @@
+{
+    "inputMessageMetadata": {
+        "flowVariables": {
+            "setB": {
+                "connectorName": "#_custom_mule_metadata_type_#",
+                "typeId": "Simple"
+            },
+            "setA": {
+                "connectorName": "#_custom_mule_metadata_type_#",
+                "typeId": "1"
+            }
+        }
+    },
+    "outputMessageMetadata": {},
+    "id": "b6247c64-d60e-4f1f-98ca-b47e65b69c57",
+    "version": "5.2.0.0"
+}

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:ws="http://www.mulesoft.org/schema/mule/ws" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="reqres.in" port="443" basePath="/api" doc:name="HTTP Request Configuration"/>
+   <ee:object-store-caching-strategy name="Caching_Strategy1" keyGenerationExpression="#[flowVars.userid]" doc:name="Caching Strategy">
+        <in-memory-store name="inMemStore" maxEntries="50" entryTTL="180000" expirationInterval="1800000"/>
+    </ee:object-store-caching-strategy>
+    <ws:consumer-config name="Web_Service_Consumer" wsdlLocation="http://www.dneonline.com/calculator.asmx?WSDL" service="Calculator" port="CalculatorSoap" serviceAddress="http://www.dneonline.com/calculator.asmx" doc:name="Web Service Consumer"/>
+    <sub-flow name="subflowsSub_Flow_Sample3">
+        <logger message="Entered subflow 3" level="INFO" doc:name="Logger"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/users" method="GET" doc:name="HTTP"/>
+        <logger message="#[json:data[0]/'id']  #[json:data[0]/'email']" level="INFO" doc:name="Logger"/>
+        <set-session-variable variableName="Email" value="#[json:data[0]/'email']" doc:name="Set First Email"/>
+        <logger message="Printing value from session variable #[sessionVars.Email]" level="INFO" doc:name="Logger"/>
+    </sub-flow>
+    <sub-flow name="subflowsSub_Flow_Sample4">
+        <logger message="Getting data for user #[flowVars.userid]" level="INFO" doc:name="Logger"/>
+        <set-payload value="#[flowVars.userid]" doc:name="Set Payload"/>
+        <ee:cache cachingStrategy-ref="Caching_Strategy1" doc:name="Cache">
+            <logger message="********* Before the cache #[flowVars.userid]" level="INFO" doc:name="Logger"/>
+            <logger message="*********  After the cahce" level="INFO" doc:name="Logger"/>
+            <http:request config-ref="HTTP_Request_Configuration" path="/users" method="GET" doc:name="HTTP"/>
+            <set-payload value="Setting data1" doc:name="Set Payload"/>
+        </ee:cache>
+        <logger message="Just before reponse" level="INFO" doc:name="Logger"/>
+    </sub-flow>
+    <sub-flow name="subflowsSub_Flow_Sample5">
+        <logger message="Get data from SOAP call" level="INFO" doc:name="Logger"/>
+        <set-variable variableName="setA" value="#[json:a]" doc:name="Variable A"/>
+        <set-variable variableName="setB" value="#[json:b]" doc:name="Variable B"/>
+        <dw:transform-message doc:name="Transform Message" metadata:id="95f6b714-f029-4e9c-925c-dfe5ef4b35cc">
+            <dw:input-variable mimeType="application/java" variableName="setA"/>
+            <dw:input-variable mimeType="application/java" variableName="setB"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 http://tempuri.org/
+---
+{
+	ns0#Add: {
+		ns0#intA: flowVars.setA,
+		ns0#intB: flowVars.setB
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <ws:consumer config-ref="Web_Service_Consumer" operation="Add" doc:name="Web Service Consumer"/>
+    </sub-flow>
+</mule>

@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" basePath="crm" doc:name="HTTP Listener Configuration"/>
-    <flow name="helloworldFlow">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
+    <flow name="Sample1">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/sample1" doc:name="HTTP"/>
         <logger message="API has started without issues" level="INFO" doc:name="Logger"/>
+        <set-payload value="&quot;hello world&quot;" doc:name="Set Payload"/>
+    </flow>
+    <flow name="SampleFlow2">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/sample2" allowedMethods="POST" doc:name="HTTP"/>
+        <set-variable variableName="name" value="#[json:name]" doc:name="name"/>
+        <validation:is-true message="Unathorized user" expression="#[flowVars.name == 'roger']" doc:name="Validation"/>
+        <logger message="#[flowVars.name]" level="INFO" doc:name="Logger"/>
+        <set-payload value="This is a response from post api" doc:name="Set Payload"/>
+    </flow>
+    <flow name="SampleFlow3">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/sample3" doc:name="HTTP"/>
+        <flow-ref name="subflowsSub_Flow_Sample3" doc:name="subflowsSub_Flow_Sample3"/>
+    </flow>
+    <flow name="SampleFlow4">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/sample4" allowedMethods="POST" doc:name="HTTP"/>
+        <set-variable variableName="userid" value="#[json:user_id]" doc:name="set user id"/>
+        <flow-ref name="subflowsSub_Flow_Sample4" doc:name="subflowsSub_Flow_Sample4"/>
+    </flow>
+    <flow name="SampleFlow5">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/sample5" doc:name="HTTP"/>
+        <flow-ref name="subflowsSub_Flow_Sample5" doc:name="subflowsSub_Flow_Sample5"/>
     </flow>
 </mule>
