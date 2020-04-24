@@ -23,6 +23,16 @@ Go through the following files in the same order:
 	Covert rest to soap
 
 
+6) Use of message enricher
+	https://jsonplaceholder.typicode.com/todos
+	How to use propery file in project
+	How do you check the reponse http headers
+	How to process xml in rest response
+	Use dw in output
+	Use of choice connector
+	
+	
+	
 
 
 

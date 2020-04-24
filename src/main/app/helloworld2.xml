@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <http:request-config name="HTTP_Request_Configuration1" protocol="HTTPS" host="jsonplaceholder.typicode.com" port="443" basePath="/" doc:name="HTTP Request Configuration"/>
+    <http:request-config name="HTTP_Request_Configuration2" host="localhost" port="8080" basePath="/" doc:name="HTTP Request Configuration"/>
+     <flow name="helloworld2Flow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/sample6" doc:name="HTTP"/>
+        <http:request config-ref="HTTP_Request_Configuration1" path="/todos" method="GET" doc:name="HTTP"/>
+        <logger message="#[dw('inboundProperties[&quot;http.status&quot;]')]" level="INFO" doc:name="Logger"/>
+    </flow>
+    <flow name="helloworld2Flow1">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/sample7" doc:name="HTTP"/>
+        <set-variable variableName="choice" value="1" doc:name="Variable"/>
+        <choice doc:name="Choice">
+            <when expression="flowVars.choice.equals(&quot;1&quot;)">
+                <set-payload value="Using choice 1" doc:name="Set Payload"/>
+                <http:request config-ref="HTTP_Request_Configuration2" path="/mockGet1" method="GET" doc:name="HTTP"/>
+                <logger message="#[dw('payload.note.to')] #[dw('payload.note.heading')]" level="INFO" doc:name="Logger"/>
+            </when>
+            <otherwise>
+                <set-payload value="Using default route" doc:name="Set Payload"/>
+            </otherwise>
+        </choice>
+    </flow>
+</mule>
