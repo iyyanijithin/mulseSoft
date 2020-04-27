@@ -24,10 +24,26 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
                 <set-payload value="Using choice 1" doc:name="Set Payload"/>
                 <http:request config-ref="HTTP_Request_Configuration2" path="/mockGet1" method="GET" doc:name="HTTP"/>
                 <logger message="#[dw('payload.note.to')] #[dw('payload.note.heading')]" level="INFO" doc:name="Logger"/>
+                <logger message="#[dw('payload.note.heading')]" level="INFO" doc:name="Logger"/>
             </when>
             <otherwise>
                 <set-payload value="Using default route" doc:name="Set Payload"/>
             </otherwise>
         </choice>
     </flow>
+    <flow name="helloWorldFlowMessage">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/sample8" doc:name="HTTP"/>
+        <set-payload value="Hello world" doc:name="Set Payload"/>
+        <logger level="INFO" doc:name="Logger"/>
+        <set-variable variableName="webservice_response" value="" doc:name="Variable"/>
+        <enricher doc:name="Message Enricher">
+            <flow-ref name="subflowInsideMessageEnricher" doc:name="subflowInsideMessageEnricher"/>
+            <enrich source="#[payload]" target="#[flowVars.webservice_response]"/>
+        </enricher>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+    </flow>
+    <sub-flow name="subflowInsideMessageEnricher">
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <http:request config-ref="HTTP_Request_Configuration2" path="/mockGet1" method="GET" doc:name="CallMock"/>
+    </sub-flow>
 </mule>

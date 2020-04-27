@@ -32,7 +32,8 @@ Go through the following files in the same order:
 	Use of choice connector
 	
 	
-	
+7) How to use message enricher
+
 
 
 
